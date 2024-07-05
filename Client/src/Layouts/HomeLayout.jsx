@@ -41,8 +41,8 @@ function HomeLayout({ children }) {
   }
 
   return (
-    <div className="min-h-[90vh]">
-      <div className="bg-white w-fit h-20"></div>
+    <div className="min-h-[80vh]">
+      {/* <FloatingNav /> */}
       <div className="drawer absolute left-0 z-50 w-fit">
         <input className="drawer-toggle" id="my-drawer" type="checkbox" />
         <div className="drawer-content">
@@ -119,7 +119,7 @@ function HomeLayout({ children }) {
         </div>
       </div>
       {/* for displaying profile icon */}
-      <div className="absolute right-0 z-50 w-fit m-3">
+      {/* <div className="absolute right-0 z-50 w-fit m-3">
         {!isLoggedIn && (
           <Link to="/login">
             <svg
@@ -158,7 +158,7 @@ function HomeLayout({ children }) {
             </svg>
           </Link>
         )}
-      </div>
+      </div> */}
 
       {children}
 
