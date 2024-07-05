@@ -11,7 +11,7 @@
 2. Move into the directory
 
 ```
-    cd lms-frontend-hn
+    cd Coursify
 ```
 
 3. install dependencies
