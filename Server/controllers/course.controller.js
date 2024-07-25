@@ -2,6 +2,7 @@ import Course from "../models/course.model.js";
 import AppError from "../utils/error.util.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
+import path from "path";
 
 const getAllCourses = async (req, res, next) => {
   try {
@@ -27,12 +28,13 @@ const getLecturesByCourseId = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Course lectures fetched succesfully",
-      lectures: course.lectures,
+      lectures: course,
     });
-  } catch (e) {
+  } catch (error) {
     return next(new AppError(error.message, 400));
   }
 };
+
 const createCourse = async (req, res, next) => {
   const { title, description, category, createdBy } = req.body;
 
@@ -98,6 +100,7 @@ const createCourse = async (req, res, next) => {
     course,
   });
 };
+
 const updateCourse = async (req, res, next) => {
   const { id } = req.params;
 
@@ -160,6 +163,7 @@ const addLectureToCourseById = async (req, res, next) => {
   }
 
   const course = await Course.findById(id);
+  console.log(course);
 
   if (!course) {
     return next(new AppError("Invalid course id or course not found.", 400));
@@ -170,18 +174,17 @@ const addLectureToCourseById = async (req, res, next) => {
     try {
       const result = await cloudinary.v2.uploader.upload(req.file.path, {
         folder: "lms", // Save files in a folder named lms
-        chunk_size: 50000000, // 50 mb size
+        chunk_size: 5000000, // 50 mb size
         resource_type: "video",
       });
 
       // If success
       if (result) {
         // Set the public_id and secure_url in array
-        lectureData.public_id = result.public_id;
-        lectureData.secure_url = result.secure_url;
+        lectureData.lecture.public_id = result.public_id;
+        lectureData.lecture.secure_url = result.secure_url;
       }
 
-      // After successful upload remove the file from local storage
       fs.rm(`uploads/${req.file.filename}`);
     } catch (error) {
       // Empty the uploads directory without deleting the uploads directory
@@ -214,59 +217,63 @@ const addLectureToCourseById = async (req, res, next) => {
 };
 const removeLectureFromCourse = async (req, res, next) => {
   // Grabbing the courseId and lectureId from req.query
-  const { courseId, lectureId } = req.query;
+  try {
+    const { courseId, lectureId } = req.query;
 
-  console.log(courseId);
-
-  // Checking if both courseId and lectureId are present
-  if (!courseId) {
-    return next(new AppError("Course ID is required", 400));
-  }
-
-  if (!lectureId) {
-    return next(new AppError("Lecture ID is required", 400));
-  }
-
-  // Find the course uding the courseId
-  const course = await Course.findById(courseId);
-
-  // If no course send custom message
-  if (!course) {
-    return next(new AppError("Invalid ID or Course does not exist.", 404));
-  }
-
-  // Find the index of the lecture using the lectureId
-  const lectureIndex = course.lectures.findIndex(
-    (lecture) => lecture._id.toString() === lectureId.toString()
-  );
-
-  // If returned index is -1 then send error as mentioned below
-  if (lectureIndex === -1) {
-    return next(new AppError("Lecture does not exist.", 404));
-  }
-
-  // Delete the lecture from cloudinary
-  await cloudinary.v2.uploader.destroy(
-    course.lectures[lectureIndex].lecture.public_id,
-    {
-      resource_type: "video",
+    // Checking if both courseId and lectureId are present
+    if (!courseId) {
+      return next(new AppError("Course ID is required", 400));
     }
-  );
 
-  // Remove the lecture from the array
-  course.lectures.splice(lectureIndex, 1);
+    if (!lectureId) {
+      return next(new AppError("Lecture ID is required", 400));
+    }
 
-  // update the number of lectures based on lectres array length
-  course.numberOfLectures = course.lectures.length;
+    // Find the course uding the courseId
+    const course = await Course.findById(courseId);
 
-  // Save the course object
-  await course.save();
+    // If no course send custom message
+    if (!course) {
+      return next(new AppError("Invalid ID or Course does not exist.", 404));
+    }
 
-  // Return response
-  res.status(200).json({
-    success: true,
-    message: "Course lecture removed successfully",
-  });
+    // Find the index of the lecture using the lectureId
+    const lectureIndex = course.lectures.findIndex(
+      (lecture) => lecture._id.toString() === lectureId.toString()
+    );
+
+    // If returned index is -1 then send error as mentioned below
+    if (lectureIndex === -1) {
+      return next(new AppError("Lecture does not exist.", 404));
+    }
+
+    console.log(course.lectures[lectureIndex]);
+
+    // Delete the lecture from cloudinary
+    await cloudinary.v2.uploader.destroy(
+      course.lectures[lectureIndex].lecture.public_id,
+      {
+        resource_type: "video",
+      }
+    );
+
+    // Remove the lecture from the array
+    course.lectures.splice(lectureIndex, 1);
+
+    // update the number of lectures based on lectres array length
+    course.numberOfLectures = course.lectures.length;
+
+    // Save the course object
+    await course.save();
+
+    // Return response
+    res.status(200).json({
+      success: true,
+      message: "Course lecture removed successfully",
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 400));
+  }
 };
 export {
   getAllCourses,

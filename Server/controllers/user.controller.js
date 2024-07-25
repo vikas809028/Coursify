@@ -157,6 +157,7 @@ const forgotPassword = async (req, res, next) => {
   await user.save();
 
   const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
   console.log(resetPasswordUrl);
 
   // We here need to send an email to the user with the token
@@ -190,6 +191,7 @@ const resetPassword = async (req, res, next) => {
   const { resetToken } = req.params;
 
   const { password } = req.body;
+
   const forgotPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
@@ -233,13 +235,14 @@ const resetPassword = async (req, res, next) => {
 };
 
 const changePassword = async (req, res, next) => {
+  console.log(req.body);
   const { oldPassword, newPassword } = req.body;
   const { id } = req.user;
 
   // Check if the values are there or not
   if (!oldPassword || !newPassword) {
     return next(
-      new AppError("Old password and new password are required", 400)
+      new AppError("Old password and new password are required", 370)
     );
   }
 
@@ -256,7 +259,7 @@ const changePassword = async (req, res, next) => {
 
   // If the old password is not valid then throw an error message
   if (!isPasswordValid) {
-    return next(new AppError("Invalid old password", 400));
+    return next(new AppError("Invalid OLD pasword", 400));
   }
 
   // Setting the new password

@@ -42,9 +42,8 @@ function HomeLayout({ children }) {
 
   return (
     <div className="min-h-[80vh]">
-      {/* <FloatingNav /> */}
       <div className="drawer absolute left-0 z-50 w-fit">
-        <input className="drawer-toggle" id="my-drawer" type="checkbox" />
+        {/* Used for Input which uses id=checkbox */}
         <div className="drawer-content">
           <label htmlFor="my-drawer" className="cursor-pointer relative">
             <FiMenu
@@ -54,7 +53,9 @@ function HomeLayout({ children }) {
             />
           </label>
         </div>
-        <div className="drawer-side w-0">
+        <input className="drawer-toggle" id="my-drawer" type="checkbox" />
+
+        <div className="drawer-side">
           <label htmlFor="my-drawer" className="drawer-overlay"></label>
           <ul className="menu p-4 w-48 h-[100%] sm:w-80 bg-base-200 text-base-content relative">
             <li className="w-fit absolute right-2 z-50">

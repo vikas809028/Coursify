@@ -28,8 +28,8 @@ function Checkout() {
     e.preventDefault();
     console.log("key", razorpayKey);
     console.log("id", subscription_id);
+
     if (!razorpayKey || !subscription_id) {
-      toast.error("Something went wrong");
       return;
     }
     const options = {

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,15 +9,16 @@ import { cancelCourseBundle } from "../../Redux/Slices/RazorpaySlice";
 
 function Profile() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const userData = useSelector((state) => state?.auth?.data);
 
   async function handleCancellation() {
     toast("Initiating cancellation");
     await dispatch(cancelCourseBundle());
-    await dispatch(getUserData());
     toast.success("Cancellation completed!");
-    navigate("/");
+    await dispatch(getUserData());
+
+    // navigate("/");
   }
   return (
     <HomeLayout>
@@ -43,7 +45,7 @@ function Profile() {
           </div>
           <div className="flex items-center justify-between gap-2">
             <Link
-              to="/changepassword"
+              to="/user/changepassword"
               className="w-1/2 bg-yellow-600 hover:bg-yellow-500 transition-all ease-in-out duration-300 rounded-sm font-semibold py-2 cursor-pointer text-center"
             >
               <button>Change password</button>
