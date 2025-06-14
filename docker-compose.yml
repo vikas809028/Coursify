@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5014:5014"
+    env_file:
+      - ./backend/.env
